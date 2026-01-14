@@ -1,0 +1,10 @@
+#header {
+    text-align: center;
+}
+
+#board {
+    display: grid;
+    grid-template-columns: auto auto auto;
+    gap: 10px;
+    justify-content: center;
+}
