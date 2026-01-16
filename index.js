@@ -17,70 +17,171 @@ var board = document.querySelector("#board")
 // Y = index / numCols
 // X = index - (Y * width)
 
-
-
 function checkForWinner(x, y) {
-    // dont need to check from all indexes, just the one that had a new item
 
-    // array is 0 index
-    const endIdx = NUM_COLS - 1
+    const isRow = checkRows(x, y, "X")
+    const isColumn = checkColumns(x, y, "X")
+    const isDiag = checkDiags(x, y, "X")
 
-    // check left and right for winner
-
-
-    // for x direction, check x variable
-    // if x is greater than 0 but less than endIdx, then we need to check both left and right direction
-    // if x is 0, we check from left until endIdx
-    // if x is equal to endIdx then check backwards
-
-    // repeat this but for y variable too
-
-    // diagonals slightly different
-
-    // if i know the row, i can just start from the beginning of that row and check NUM_COLS items
-
-    const isSame = (arr) => {
-        const same = arr.every((a) => {
-            if(a == "X") {
-                return a === arr[0]
-            }
-            else {
-                return false
-            }
-        })
-
-        return same
+    if( isRow || isColumn || isDiag) {
+        console.log("we found a winner")
     }
 
+}
+
+function checkRows(x, y, symbol) {
+
+    const rowStart = 0 + y * NUM_COLS
+    const rowEnd = NUM_COLS + y * NUM_COLS
+    const row = BOARD.slice(rowStart, rowEnd)
+    const isSame = row.every(r => r === symbol)
+
+
+    if(isSame && !row.includes("0")){
+        console.log("winner found in the row")
+        return true
+    }
+    else{
+        return false
+    }
+}
+
+
+function checkColumns(x, y, symbol) {
+    let colIdx = x + 0 * NUM_COLS;
+    let prev = BOARD[colIdx]
+    let count = 1
+
+    for(let i=1; i<NUM_COLS; i++){
+        colIdx = x + i * NUM_COLS
+        if(prev == BOARD[colIdx] && BOARD[colIdx] != '0'){
+            count++
+            prev = BOARD[colIdx]
+        }
+        else {
+            count = 0
+        }
+
+        if(count == NUM_COLS){
+            break;
+        }
+    }
+
+    if(count == NUM_COLS){
+        console.log("winner found in column")
+        return true
+    }
+    else{
+        return false
+    }
+}
+
+function checkDiags(x, y, symbol) {
+    let topX = x - 1
+    let topY = y - 1
+    const idx = x + y * NUM_COLS
+
+    console.log(topX, topY)
     
-    const rowStart = 0 + y * endIdx
-    const rowEnd = endIdx + y * endIdx
+    let diagCount = 0
 
-    const row = BOARD.slice(rowStart, rowEnd+1)
+    while(topX >= 0 && topY>=0 ){
+        const newIdx = topX + topY * NUM_COLS
 
+        console.log(BOARD[newIdx])
 
-    console.log(row)
+        if(BOARD[idx] === BOARD[newIdx]){
+            diagCount += 1
+        }
+        else {
+            break
+        }
 
-    if(isSame(row) && !row.includes("0")){
-        console.log("winner found")
+        topX -= 1
+        topY -= 1
+    }
+
+    let leftRightDiag = diagCount
+
+    diagCount = 0
+    topX = x + 1
+    topY = y + 1 
+
+    while(topX < NUM_COLS && topY < NUM_COLS){
+        const newIdx = topX + topY * NUM_COLS
+
+        if(BOARD[idx] === BOARD[newIdx]){
+            diagCount += 1
+        }
+        else {
+            break
+        }
+
+        topX += 1
+        topY +=1
     }
 
 
-    // if(x >= 0 && x<endIdx) {
-        
+    leftRightDiag += diagCount + 1;
 
-    // }
-    // else if(x == endIdx) {
+    // early return here if found in top left
+    if(leftRightDiag == NUM_COLS){
+        console.log("winner in top left to bottom right diagonal")
 
-    // }
-    // else if(x == 0){
-
-    // }
+        return true
+    }
 
 
+    let rightLeftDiag = 0
 
-    
-    
+    diagCount = 0
+    topX = x + 1
+    topY = y - 1 
+
+    console.log(topX, topY)
+
+    while(topX < NUM_COLS && topY >= 0){
+        const newIdx = topX + topY * NUM_COLS
+
+        if(BOARD[idx] === BOARD[newIdx]){
+            diagCount += 1
+        }
+        else {
+            break
+        }
+
+        topX += 1
+        topY -=1
+    }
+
+    rightLeftDiag += diagCount
+
+    diagCount = 0
+    topX = x - 1
+    topY = y + 1 
+
+    while(topX >= 0 && topY < NUM_COLS){
+        const newIdx = topX + topY * NUM_COLS
+
+        if(BOARD[idx] === BOARD[newIdx]){
+            diagCount += 1
+        }
+        else {
+            break
+        }
+
+        topX -= 1
+        topY +=1
+    }
+
+    rightLeftDiag += diagCount
+    rightLeftDiag += 1
+
+    if(rightLeftDiag == NUM_COLS) {
+        return true
+    }
+
+    return false
 }
 
 
@@ -110,33 +211,6 @@ for(let i =0; i<BOARD_SIZE; i++){
     })
 
 }
-
-
-
-
-
-// while(!gameOver){
-    
-//     if(P1turn){
-//         // make selection of where to place item
-//         // player clicks div, get index of div in grid, use that index to update position in board
-        
-//     }
-//     else{
-
-//     }
-
-//     // check for winners
-
-
-    
-
-// }
-
-
-
-
-
 
 
 
