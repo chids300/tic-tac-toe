@@ -1,76 +1,96 @@
-const WIN_COUNT = 3
+let WIN_COUNT = 3
 let NUM_COLS = 3
-const BOARD_SIZE = NUM_COLS ** 2
 
-const BOARD = Array(BOARD_SIZE)
-BOARD.fill("0")
+let BOARD_SIZE = NUM_COLS ** 2
+const BOARD = []
 
 let P1turn = true
 let gameOver = false
 
 const board = document.querySelector("#board")
 const statusText = document.querySelector("#status-text")
+const restartBtn = document.querySelector("#restart-btn")
 
-statusText.innerHTML = "Player 1s turn"
-
+restartBtn.addEventListener("click", () => newGame(BOARD_SIZE))
 
 // formula for mapping to row major and mapping it back
 // i = X + Y * numCols
 // Y = index / numCols
 // X = index - (Y * width)
 
+newGame(BOARD_SIZE)
 
+function newGame(board_size) {
+    board.innerHTML = ""
+    BOARD.length= 0
 
+    statusText.innerHTML = "Player 1s turn"
 
-for(let i =0; i<BOARD_SIZE; i++){
-    var div = document.createElement('div')
-    //var button = document.createElement('button')
+    let P1turn = true
+    let gameOver = false
 
-    board.appendChild(div)
-    div.classList.add("boardItem")
+    for(let i =0; i<board_size; i++){
+        var div = document.createElement('div')
+        div.classList.add("boardItem")
+        div.textContent = ""
 
-    //div.appendChild(button)
-    // pass index to event listener
-    // so we can easily map the 
+        div.style.back
 
-    div.addEventListener("click", function() {
-        if(!gameOver){
-            const symbol = P1turn ? 'X' : 'O'
+        board.appendChild(div)
+        BOARD.push(div)
 
-            BOARD[i] = symbol
-            this.textContent = symbol
+        div.addEventListener("click", function() {
+            if(!gameOver){
+                const symbol = P1turn ? 'X' : 'O'
 
-            const Y = Math.floor(i / NUM_COLS)
-            const X = i - (Y * NUM_COLS)
+                this.textContent = symbol
 
-            const winner = checkForWinner(X, Y, WIN_COUNT)
+                const Y = Math.floor(i / NUM_COLS)
+                const X = i - (Y * NUM_COLS)
 
-            if(winner){
-                statusText.innerHTML = `${P1turn ? "Player 1" : "Player 2"} wins`
-                gameOver = true
+                const winner = checkForWinner(X, Y, WIN_COUNT)
+
+                if(winner){
+                    statusText.innerHTML = `${P1turn ? "Player 1" : "Player 2"} wins`
+                    gameOver = true
+                }
+                else{
+                    P1turn = !P1turn
+                    statusText.innerHTML = `${P1turn ? "Player 1's" : "Player 2's"} turn`
+                }
             }
-            else{
-                P1turn = !P1turn
-                statusText.innerHTML = `${P1turn ? "Player 1's" : "Player 2's"} turn`
-            }
-        }
-    })
+        })
+    }
+
 }
 
-function restartGame() {
-    window.location.reload()
-}
+
 
 
 function checkForWinner(x, y, WIN_COUNT) {
 
-    const isRow = checkRows(x, y, WIN_COUNT)
+    // const flashWinning = (boardIdx) => {
+    //     boardIdx.map((i) => )
+    // }
+
+    const rows = checkRows(x, y, WIN_COUNT)
+
+    if(checkRows(x, y, WIN_COUNT).length == WIN_COUNT) {
+        
+    }
+
     const isColumn = checkColumns(x, y, WIN_COUNT)
     const isDiag = checkDiags(x, y, WIN_COUNT)
 
-    if( isRow || isColumn || isDiag) {
+    if( rows.length == WIN_COUNT || isColumn || isDiag) {
         return true
     }
+}
+
+function flashDiv(divIndex) {
+    const div = BOARD[divIndex]
+
+    
 
 }
 
@@ -78,43 +98,46 @@ function checkRows(x, y, winAmount) {
     // want to check on the left and right side of the index
     // start with left side
 
+    const winningIdx = []
     const startIdx = x + y * NUM_COLS;
+
+    winningIdx.push(startIdx)
 
     let leftCount = 0
 
     let leftX = x - 1
     let leftIdx = leftX + y * NUM_COLS;
 
-    while(leftX >=0 && BOARD[leftIdx] === BOARD[startIdx]){
+    while(leftX >=0 && BOARD[leftIdx].textContent === BOARD[startIdx].textContent && leftCount < winAmount){
         leftCount++ 
         leftX -= 1
+        winningIdx.push(leftIdx)
 
         leftIdx = leftX + y * NUM_COLS
     }
 
-    if((leftCount + 1) >= winAmount){
-        return true
+    if(winningIdx.length == winAmount){
+        return winningIdx
     }
 
     let rightCount = 0
-
     let rightX = x + 1
     let rightIdx = rightX + y * NUM_COLS
 
-    while(rightX < NUM_COLS && BOARD[rightIdx] === BOARD[startIdx]){
+    while(rightX < NUM_COLS && BOARD[rightIdx].textContent === BOARD[startIdx].textContent && rightCount < winAmount){
         rightCount++
         rightX++
 
+        winningIdx.push(rightIdx)
         rightIdx = rightX + y * NUM_COLS
     }
 
-    console.log(leftCount, rightCount)
 
-    if((leftCount + rightCount + 1) >= winAmount) {
-        return true
+    if(winningIdx.length == winAmount) {
+        return winningIdx
     }
 
-    return false
+    return winningIdx
 }
 
 
@@ -125,7 +148,7 @@ function checkColumns(x, y, winAmount) {
     let newIdx = x + topY * NUM_COLS
     let topCount = 0
 
-    while(topY >= 0 && BOARD[newIdx] === BOARD[startIdx] && topCount <= winAmount){
+    while(topY >= 0 && BOARD[newIdx].textContent === BOARD[startIdx].textContent && topCount <= winAmount){
         topCount += 1
 
         topY -= 1
@@ -141,7 +164,7 @@ function checkColumns(x, y, winAmount) {
 
     newIdx = x + bottomY * NUM_COLS
 
-    while(bottomY < NUM_COLS && BOARD[newIdx] === BOARD[startIdx] && bottomCount <= winAmount){
+    while(bottomY < NUM_COLS && BOARD[newIdx].textContent === BOARD[startIdx].textContent && bottomCount <= winAmount){
         bottomCount += 1
         bottomY += 1
 
@@ -167,7 +190,7 @@ function checkDiags(x, y, winAmount) {
     
     let topLeftCount = 0
 
-    while(topLeftX >= 0 && topLeftY>=0 && BOARD[newIdx] === BOARD[startIdx]){
+    while(topLeftX >= 0 && topLeftY>=0 && BOARD[newIdx].textContent === BOARD[startIdx].textContent){
         topLeftCount += 1
         topLeftX -= 1
         topLeftY -= 1
@@ -186,7 +209,7 @@ function checkDiags(x, y, winAmount) {
 
     let bottomRightCount = 0
 
-    while(bottomRightX < NUM_COLS && bottomRightY < NUM_COLS && BOARD[newIdx] === BOARD[startIdx]){
+    while(bottomRightX < NUM_COLS && bottomRightY < NUM_COLS && BOARD[newIdx].textContent === BOARD[startIdx].textContent){
         bottomRightCount += 1
 
         bottomRightX += 1
@@ -207,7 +230,7 @@ function checkDiags(x, y, winAmount) {
 
     let topRightCount = 0
 
-    while(topRightX < NUM_COLS && topRightY >=0 && BOARD[newIdx] === BOARD[startIdx]){
+    while(topRightX < NUM_COLS && topRightY >=0 && BOARD[newIdx].textContent === BOARD[startIdx].textContent){
         topRightCount += 1
 
         topRightX += 1
@@ -228,7 +251,7 @@ function checkDiags(x, y, winAmount) {
 
     let bottomLeftCount = 0
 
-    while(bottomLeftX >= 0 && bottomLeftY < NUM_COLS && BOARD[newIdx] === BOARD[startIdx]){
+    while(bottomLeftX >= 0 && bottomLeftY < NUM_COLS && BOARD[newIdx].textContent === BOARD[startIdx].textContent){
         bottomLeftCount += 1
 
         bottomLeftX -= 1
