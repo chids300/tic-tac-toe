@@ -18,9 +18,16 @@ body {
     justify-content: center;
 }
 
-#status-text {
-    text-align: center;
+#status-bar {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
+
+#round-status {
+    display: none;
+}
+
 
 #config-bar {
     display: flex;
@@ -29,13 +36,30 @@ body {
     padding-top: 1em;
 }
 
+#round-info {
+    display: flex;
+    margin-top: 4em;
+    justify-content: center;
+
+}
+
+#round-scores {
+    background-color: rgb(60, 60, 60);
+    padding: 2em;
+    border-color: rgb(100, 100, 100);
+    border-width: 2px;
+    border-style: solid;
+    display: none;
+
+}
+
 
 .boardItem {
     background-color: slategrey;
     border-radius: 0.5em;
     border-style: solid;
     border-color: lightgrey;
-    border-width: 2;
+    border-width: 2px;
     display: flex;
     justify-content: center;
     align-items: center;

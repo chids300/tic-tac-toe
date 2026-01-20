@@ -14,7 +14,11 @@
         </div>
 
         <hr>
-        <p id="status-text">
+
+        <div id="status-bar">
+            <p id="status-text"></p>
+            <p id="round-status">hello world</p>
+        </div>
             
         </p>
 
@@ -23,7 +27,22 @@
 
         <div id="config-bar">
             <button id="restart-btn">restart game</button>
+
+            <div id="round-container">
+                <label for="round-select">Number of rounds</label>
+                <select name="numRounds" id="round-select">
+                    <option value="1"> 1</option>
+                    <option value="2"> 2</option>
+                    <option value="3"> 3</option>
+                    <option value="4"> 4</option>
+                </select>
+            </div>
         </div>
 
+        <div id="round-info">
+            <div id="round-scores">
+                some mock info here
+            </div>
+        </div>
     </body>
 </html>

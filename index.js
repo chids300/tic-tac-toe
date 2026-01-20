@@ -4,44 +4,88 @@ let NUM_COLS = 3
 let BOARD_SIZE = NUM_COLS ** 2
 const BOARD = []
 
-let P1turn = true
-let gameOver = false
+let NUM_ROUNDS = 3
+const ROUND_WINS = []
+let CURRENT_ROUND = 1
+
+let P1_TURN = true
+let GAME_OVER = false
+
+// to check if any moves have been made, i do this so
+let itemPlayed = false;
 
 const board = document.querySelector("#board")
 const statusText = document.querySelector("#status-text")
 const restartBtn = document.querySelector("#restart-btn")
+const roundSelection = document.querySelector("#round-select")
+const roundStatus = document.querySelector("#round-status")
+const roundScores = document.querySelector("#round-scores")
 
 restartBtn.addEventListener("click", () => newGame(BOARD_SIZE))
 
-// formula for mapping to row major and mapping it back
+roundSelection.addEventListener('change', function () {
+    if(itemPlayed) {
+        alert("restart game before changing round amount")
+    }
+
+
+    NUM_ROUNDS = Number(this.value)
+    console.log(NUM_ROUNDS)
+
+    // if(!GAME_OVER) {
+    //     alert("only select a round when the game is over")
+    //     return
+    // }
+
+    if(NUM_ROUNDS >= 2) {
+        roundStatus.style.display = "block"
+        roundStatus.textContent = `round ${CURRENT_ROUND}/${NUM_ROUNDS}`
+    }
+    else{
+        roundStatus.style.display = "none"
+    }
+
+})
+
+
+
+// formula for mapping 1D coords to 2D coords and mapping it back
 // i = X + Y * numCols
 // Y = index / numCols
 // X = index - (Y * width)
 
+
 newGame(BOARD_SIZE)
 
-function newGame(board_size) {
-    board.innerHTML = ""
-    BOARD.length= 0
 
+function newGame(board_size) {
     statusText.innerHTML = "Player 1s turn"
 
-    let P1turn = true
-    let gameOver = false
+    P1_TURN = true
+    GAME_OVER = false
+
+    initBoard(BOARD_SIZE)
+}
+
+
+function initBoard(board_size) {
+    board.innerHTML = ""
+    BOARD.length= 0
 
     for(let i =0; i<board_size; i++){
         var div = document.createElement('div')
         div.classList.add("boardItem")
         div.textContent = ""
 
-        div.style.back
 
         board.appendChild(div)
         BOARD.push(div)
 
         div.addEventListener("click", function() {
-            if(!gameOver){
-                const symbol = P1turn ? 'X' : 'O'
+            itemPlayed = true
+
+            if(!GAME_OVER){
+                const symbol = P1_TURN ? 'X' : 'O'
 
                 this.textContent = symbol
 
@@ -51,16 +95,56 @@ function newGame(board_size) {
                 const winner = checkForWinner(X, Y, WIN_COUNT)
 
                 if(winner){
-                    statusText.innerHTML = `${P1turn ? "Player 1" : "Player 2"} wins`
-                    gameOver = true
+                    statusText.innerHTML = `${P1_TURN ? "Player 1" : "Player 2"} wins`
+                    ROUND_WINS.push(P1_TURN)
+
+                    if(NUM_ROUNDS > 1){
+                        CURRENT_ROUND += 1
+                        updateRoundText(CURRENT_ROUND, NUM_ROUNDS)
+
+                        setTimeout(() => initBoard(board_size), 1000)
+
+                        //initBoard(board_size)
+                    }
+                    else if(CURRENT_ROUND == NUM_ROUNDS){
+                        GAME_OVER = true
+                    }
+
                 }
                 else{
-                    P1turn = !P1turn
-                    statusText.innerHTML = `${P1turn ? "Player 1's" : "Player 2's"} turn`
+                    P1_TURN = !P1_TURN
+                    statusText.innerHTML = `${P1_TURN ? "Player 1's" : "Player 2's"} turn`
                 }
             }
         })
     }
+}
+
+
+function updateRoundText(currentRound, numRounds) {
+    roundStatus.style.display = "block"
+    roundStatus.textContent = `Round ${currentRound}/${numRounds}`
+
+    roundScores.style.display = "block"
+    
+    // const roundObj = ROUND_WINS.reduce((prev, current, index) => ({
+    //     ...prev,
+    //     [`Round ${index + 1}`]: current === true ? "Player 1" : "Player 2"
+
+    // }), "")
+
+
+    const text = ROUND_WINS.reduce((prev, player1, index) => {
+        const roundNum = index + 1
+        const player = player1 ? "Player 1" : "Player 2"
+
+        return `${prev}\nRound ${roundNum}: ${player}`
+
+    }, "")
+
+    roundScores.textContent = `Round winners\n ${text}`
+
+    console.log(text)
 
 }
 
