@@ -67,6 +67,13 @@ function newGame(board_size) {
     initBoard(BOARD_SIZE)
 }
 
+function restartGame() {
+    CURRENT_ROUND = 1
+    NUM_ROUNDS = 1
+
+    newGame(BOARD_SIZE)
+}
+
 
 function initBoard(board_size) {
     board.innerHTML = ""
