@@ -64,35 +64,51 @@ function newGame(board_size) {
 
 }
 
+const flashBoardItem = (boardIdx) => {
+    boardIdx.forEach(i => {
+        const item = BOARD[i]
 
+        if(item.classList.contains("flashColor")){
+            item.classList.remove("flashColor")
+        }
+        else {
+            item.classList.add("flashColor")
+        }
+    })
+}
 
 
 function checkForWinner(x, y, WIN_COUNT) {
 
-    // const flashWinning = (boardIdx) => {
-    //     boardIdx.map((i) => )
-    // }
-
     const rows = checkRows(x, y, WIN_COUNT)
+    const columns = checkColumns(x, y, WIN_COUNT)
+    const diagonal = checkDiags(x, y, WIN_COUNT)
 
-    if(checkRows(x, y, WIN_COUNT).length == WIN_COUNT) {
-        
-    }
+    if(rows.length == WIN_COUNT) {
+        const flashInterval = setInterval(() => flashBoardItem(rows), 100)
+        setTimeout(() => clearInterval(flashInterval), 3000)
 
-    const isColumn = checkColumns(x, y, WIN_COUNT)
-    const isDiag = checkDiags(x, y, WIN_COUNT)
+        return true
 
-    if( rows.length == WIN_COUNT || isColumn || isDiag) {
+    } else if(columns.length == WIN_COUNT) {
+        const flashInterval = setInterval(() => flashBoardItem(columns), 100)
+        setTimeout(() => clearInterval(flashInterval), 3000)
+
         return true
     }
+    else if(diagonal.length == WIN_COUNT) {
+        const flashInterval = setInterval(() => flashBoardItem(diagonal), 100)
+        setTimeout(() => clearInterval(flashInterval), 3000)
+
+        return true
+    }
+
+
+    return false
+
+
 }
 
-function flashDiv(divIndex) {
-    const div = BOARD[divIndex]
-
-    
-
-}
 
 function checkRows(x, y, winAmount) {
     // want to check on the left and right side of the index
@@ -133,9 +149,6 @@ function checkRows(x, y, winAmount) {
     }
 
 
-    if(winningIdx.length == winAmount) {
-        return winningIdx
-    }
 
     return winningIdx
 }
@@ -144,43 +157,47 @@ function checkRows(x, y, winAmount) {
 function checkColumns(x, y, winAmount) {
     const startIdx = x + y * NUM_COLS;
 
+    const winningIdx = []
+    winningIdx.push(startIdx)
+
     let topY = y - 1
     let newIdx = x + topY * NUM_COLS
     let topCount = 0
 
-    while(topY >= 0 && BOARD[newIdx].textContent === BOARD[startIdx].textContent && topCount <= winAmount){
+    while(topY >= 0 && BOARD[newIdx].textContent === BOARD[startIdx].textContent && topCount < winAmount){
         topCount += 1
 
         topY -= 1
+        winningIdx.push(newIdx)
         newIdx = x + topY * NUM_COLS
     }
 
-    if((topCount + 1) >= winAmount) {
-        return true
+    if(winningIdx.length === winAmount) {
+        return winningIdx
     }
+
 
     let bottomY = y + 1
     let bottomCount = 0
 
     newIdx = x + bottomY * NUM_COLS
 
-    while(bottomY < NUM_COLS && BOARD[newIdx].textContent === BOARD[startIdx].textContent && bottomCount <= winAmount){
+    while(bottomY < NUM_COLS && BOARD[newIdx].textContent === BOARD[startIdx].textContent && bottomCount < winAmount){
         bottomCount += 1
         bottomY += 1
 
+
+        winningIdx.push(newIdx)
         newIdx = x + bottomY * NUM_COLS
     }
 
-    if((bottomCount + topCount + 1) >= winAmount) {
-        return true
-    }
-
-    return false
-
+    return winningIdx
 }
 
 function checkDiags(x, y, winAmount) {
     const startIdx = x + y * NUM_COLS
+    const winningIdx = []
+    winningIdx.push(startIdx)
 
     // for diagonal goin from top left to bottom right
     let topLeftX = x - 1
@@ -190,16 +207,17 @@ function checkDiags(x, y, winAmount) {
     
     let topLeftCount = 0
 
-    while(topLeftX >= 0 && topLeftY>=0 && BOARD[newIdx].textContent === BOARD[startIdx].textContent){
+    while(topLeftX >= 0 && topLeftY>=0 && BOARD[newIdx].textContent === BOARD[startIdx].textContent && topLeftCount < winAmount){
         topLeftCount += 1
         topLeftX -= 1
         topLeftY -= 1
 
+        winningIdx.push(newIdx)
         newIdx = topLeftX + topLeftY * NUM_COLS
     }
 
-    if((topLeftCount + 1) >= winAmount) {
-        return true
+    if(winningIdx.length == winAmount) {
+        return winningIdx
     }
 
     let bottomRightX = x + 1
@@ -209,17 +227,19 @@ function checkDiags(x, y, winAmount) {
 
     let bottomRightCount = 0
 
-    while(bottomRightX < NUM_COLS && bottomRightY < NUM_COLS && BOARD[newIdx].textContent === BOARD[startIdx].textContent){
+    while(bottomRightX < NUM_COLS && bottomRightY < NUM_COLS && BOARD[newIdx].textContent === BOARD[startIdx].textContent && bottomRightCount < winAmount){
         bottomRightCount += 1
 
         bottomRightX += 1
         bottomRightY += 1
 
+        winningIdx.push(newIdx)
+
         newIdx = bottomRightX + bottomRightY * NUM_COLS
     }
 
-    if((bottomRightCount + topLeftCount + 1) >= winAmount) {
-        return true
+    if(winningIdx.length == winAmount) {
+        return winningIdx
     }
 
     // for diagonal going from top right to bottom left
@@ -230,18 +250,20 @@ function checkDiags(x, y, winAmount) {
 
     let topRightCount = 0
 
-    while(topRightX < NUM_COLS && topRightY >=0 && BOARD[newIdx].textContent === BOARD[startIdx].textContent){
+    while(topRightX < NUM_COLS && topRightY >=0 && BOARD[newIdx].textContent === BOARD[startIdx].textContent && topRightCount < winAmount){
         topRightCount += 1
 
         topRightX += 1
         topRightY -= 1
 
+        winningIdx.push(newIdx)
+
         newIdx = topRightX + topRightY * NUM_COLS
     }
 
 
-    if((topRightCount + 1) >= winAmount) {
-        return true
+    if(winningIdx.length == winAmount) {
+        return winningIdx
     }
 
     let bottomLeftX = x - 1
@@ -251,20 +273,19 @@ function checkDiags(x, y, winAmount) {
 
     let bottomLeftCount = 0
 
-    while(bottomLeftX >= 0 && bottomLeftY < NUM_COLS && BOARD[newIdx].textContent === BOARD[startIdx].textContent){
+    while(bottomLeftX >= 0 && bottomLeftY < NUM_COLS && BOARD[newIdx].textContent === BOARD[startIdx].textContent && bottomLeftCount < winAmount){
         bottomLeftCount += 1
 
         bottomLeftX -= 1
         bottomLeftY += 1
 
+        winningIdx.push(newIdx)
+
         newIdx = bottomLeftX + bottomLeftY * NUM_COLS
     }
 
-    if((bottomLeftCount + topRightCount + 1) >= winAmount) {
-        return true
-    }
 
-    return false
+    return winningIdx
 }
 
 
