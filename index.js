@@ -91,11 +91,15 @@ function initBoard(board_size) {
 
             if(!GAME_OVER){
 
-                GAME_OVER = true
-                const symbol = P1_TURN ? 'X' : 'O'
+                // first check if square has already been clicked
                 if(['X', 'O'].includes(this.textContent)) return
 
+                // dont process new moves whilst calculating winner
+                GAME_OVER = true
+                const symbol = P1_TURN ? 'X' : 'O'
+
                 TURN_COUNT += 1 
+
                 this.textContent = symbol
                 const Y = Math.floor(i / NUM_COLS)
                 const X = i - (Y * NUM_COLS)
@@ -126,12 +130,19 @@ function initBoard(board_size) {
 
                         setTimeout(() => {
                             clearInterval(flashInterval)
+
+                            if(NUM_ROUNDS > 1){
+                                updateRoundScores()
+                                calculateRoundWinner()
+                            }
+
                             GAME_OVER = true
                         }, 3000)
                     }
 
                 }
                 else if(winningRows == null && TURN_COUNT < BOARD.length){
+
                     GAME_OVER = false
                     P1_TURN = !P1_TURN
                     statusText.innerHTML = `${P1_TURN ? "Player 1's" : "Player 2's"} turn`
@@ -140,6 +151,7 @@ function initBoard(board_size) {
                 else if(winningRows == null 
                     && TURN_COUNT == BOARD.length
                     && CURRENT_ROUND < NUM_ROUNDS) {
+
 
                     statusText.textContent = "A draw has occured"
                     ROUND_WINS.push(Draw)
@@ -154,6 +166,7 @@ function initBoard(board_size) {
 
                     statusText.textContent = "A draw has occured"
                     ROUND_WINS.push(Draw)
+                    updateRoundScores()
 
                     GAME_OVER = true
 
@@ -163,21 +176,65 @@ function initBoard(board_size) {
     }
 }
 
+function calculateRoundWinner() {
+    const p1WinCount = ROUND_WINS
+        .reduce((previous, roundWinner) => {
+            if(roundWinner == P1Win){
+                return previous + 1
+            }
+
+            return previous
+
+        }, 0)
+
+    const p2WinCount = ROUND_WINS
+        .reduce((previous, roundWinner) => {
+            if(roundWinner == P2Win){
+                return previous + 1
+            }
+
+            return previous
+        }, 0)
+
+    const drawCount = ROUND_WINS
+        .reduce((previous, roundWinner) => {
+            if(roundWinner == Draw){
+                return previous + 1
+            }
+
+            return previous
+        }, 0)
+
+    if(p1WinCount > p2WinCount && p1WinCount > drawCount){
+        updateRoundStatusText("Player 1 is the champion")    
+    }
+    else if(p2WinCount > p1WinCount && p2WinCount > drawCount){
+        updateRoundStatusText("Player 2 is the champion")    
+    }
+    else if(drawCount > p1WinCount && drawCount > p2WinCount){
+        updateRoundStatusText("You are both losers")
+    }
+}
 
 function nextRound() {
     GAME_OVER = false
     CURRENT_ROUND += 1
     TURN_COUNT = 0
-    updateRoundText()
+
+    updateRoundStatusText(`Round ${CURRENT_ROUND}/${NUM_ROUNDS}`)
+    updateRoundScores()
+
     initBoard(BOARD_SIZE)
 }
 
-function updateRoundText() {
+
+function updateRoundStatusText(text) {
     roundStatus.style.display = "block"
-    roundStatus.textContent = `Round ${CURRENT_ROUND}/${NUM_ROUNDS}`
+    roundStatus.textContent = text
+}
 
+function updateRoundScores() {
     roundScores.innerHTML = ""
-
     roundScores.style.display = "flex"
 
     const scoresHeader = document.createElement("h2")
@@ -205,7 +262,6 @@ function updateRoundText() {
         p.textContent = text
         roundScores.appendChild(p)
     })
-
 }
 
 const flashBoardItem = (boardIdx) => {
@@ -220,6 +276,13 @@ const flashBoardItem = (boardIdx) => {
         }
     })
 }
+
+
+// for rows it looks at the cells to the left and right of the clicked cell
+
+// for columns it looks at the cells to the top and bottom
+
+// for diagonals it looks at cells (x +- 1), (y +- 1) to get the top right, top left, bottom right and bottom left colums
 
 
 function checkForWinner(x, y, WIN_COUNT) {
@@ -280,8 +343,6 @@ function checkRows(x, y, winAmount) {
         winningIdx.push(rightIdx)
         rightIdx = rightX + y * NUM_COLS
     }
-
-
 
     return winningIdx
 }
@@ -421,7 +482,6 @@ function checkDiags(x, y, winAmount) {
 
         newIdx = bottomLeftX + bottomLeftY * NUM_COLS
     }
-
 
     return winningIdx
 }
