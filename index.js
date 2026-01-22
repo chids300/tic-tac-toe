@@ -4,12 +4,18 @@ let NUM_COLS = 3
 let BOARD_SIZE = NUM_COLS ** 2
 const BOARD = []
 
-let NUM_ROUNDS = 3
+let NUM_ROUNDS = 1
 const ROUND_WINS = []
 let CURRENT_ROUND = 1
+let TURN_COUNT = 0
 
 let P1_TURN = true
 let GAME_OVER = false
+
+const P1Win = 0
+const P2Win = 1
+const Draw = 2
+
 
 // to check if any moves have been made, i do this so
 let itemPlayed = false;
@@ -21,21 +27,15 @@ const roundSelection = document.querySelector("#round-select")
 const roundStatus = document.querySelector("#round-status")
 const roundScores = document.querySelector("#round-scores")
 
-restartBtn.addEventListener("click", () => newGame(BOARD_SIZE))
 
 roundSelection.addEventListener('change', function () {
     if(itemPlayed) {
         alert("restart game before changing round amount")
+        return
     }
-
 
     NUM_ROUNDS = Number(this.value)
     console.log(NUM_ROUNDS)
-
-    // if(!GAME_OVER) {
-    //     alert("only select a round when the game is over")
-    //     return
-    // }
 
     if(NUM_ROUNDS >= 2) {
         roundStatus.style.display = "block"
@@ -47,12 +47,11 @@ roundSelection.addEventListener('change', function () {
 
 })
 
-
-
 // formula for mapping 1D coords to 2D coords and mapping it back
 // i = X + Y * numCols
 // Y = index / numCols
 // X = index - (Y * width)
+
 
 
 newGame(BOARD_SIZE)
@@ -60,18 +59,17 @@ newGame(BOARD_SIZE)
 
 function newGame(board_size) {
     statusText.innerHTML = "Player 1s turn"
+    roundStatus.style.display = "none"
+    ROUND_WINS.length = 0
 
-    P1_TURN = true
-    GAME_OVER = false
-
-    initBoard(BOARD_SIZE)
-}
-
-function restartGame() {
     CURRENT_ROUND = 1
     NUM_ROUNDS = 1
+    P1_TURN = true
+    TURN_COUNT = 0
+    GAME_OVER = false
+    itemPlayed = false
 
-    newGame(BOARD_SIZE)
+    initBoard(BOARD_SIZE)
 }
 
 
@@ -92,66 +90,121 @@ function initBoard(board_size) {
             itemPlayed = true
 
             if(!GAME_OVER){
+
+                GAME_OVER = true
                 const symbol = P1_TURN ? 'X' : 'O'
+                if(['X', 'O'].includes(this.textContent)) return
 
+                TURN_COUNT += 1 
                 this.textContent = symbol
-
                 const Y = Math.floor(i / NUM_COLS)
                 const X = i - (Y * NUM_COLS)
 
-                const winner = checkForWinner(X, Y, WIN_COUNT)
+                const winningRows = checkForWinner(X, Y, WIN_COUNT)
 
-                if(winner){
+
+                if(winningRows != null){
                     statusText.innerHTML = `${P1_TURN ? "Player 1" : "Player 2"} wins`
-                    ROUND_WINS.push(P1_TURN)
 
-                    if(NUM_ROUNDS > 1){
-                        CURRENT_ROUND += 1
-                        updateRoundText(CURRENT_ROUND, NUM_ROUNDS)
+                    
+                    ROUND_WINS.push(P1_TURN ? P1Win : P2Win)
 
-                        setTimeout(() => initBoard(board_size), 1000)
+                    if(NUM_ROUNDS > 1 && CURRENT_ROUND < NUM_ROUNDS){
 
-                        //initBoard(board_size)
+                        const flashInterval = setInterval(() => flashBoardItem(winningRows), 100)
+
+                        setTimeout(() => {
+                            clearInterval(flashInterval)
+                            nextRound()
+
+                        }, 3000)
+
                     }
                     else if(CURRENT_ROUND == NUM_ROUNDS){
-                        GAME_OVER = true
+
+                        const flashInterval = setInterval(() => flashBoardItem(winningRows), 100)
+
+                        setTimeout(() => {
+                            clearInterval(flashInterval)
+                            GAME_OVER = true
+                        }, 3000)
                     }
 
                 }
-                else{
+                else if(winningRows == null && TURN_COUNT < BOARD.length){
+                    GAME_OVER = false
                     P1_TURN = !P1_TURN
                     statusText.innerHTML = `${P1_TURN ? "Player 1's" : "Player 2's"} turn`
                 }
+
+                else if(winningRows == null 
+                    && TURN_COUNT == BOARD.length
+                    && CURRENT_ROUND < NUM_ROUNDS) {
+
+                    statusText.textContent = "A draw has occured"
+                    ROUND_WINS.push(Draw)
+
+                    setTimeout(() => nextRound(), 2000)
+
+                }
+
+                else if(winningRows == null
+                    && TURN_COUNT == BOARD.length
+                    && CURRENT_ROUND == NUM_ROUNDS) {
+
+                    statusText.textContent = "A draw has occured"
+                    ROUND_WINS.push(Draw)
+
+                    GAME_OVER = true
+
+                    }
             }
         })
     }
 }
 
 
-function updateRoundText(currentRound, numRounds) {
+function nextRound() {
+    GAME_OVER = false
+    CURRENT_ROUND += 1
+    TURN_COUNT = 0
+    updateRoundText()
+    initBoard(BOARD_SIZE)
+}
+
+function updateRoundText() {
     roundStatus.style.display = "block"
-    roundStatus.textContent = `Round ${currentRound}/${numRounds}`
+    roundStatus.textContent = `Round ${CURRENT_ROUND}/${NUM_ROUNDS}`
 
-    roundScores.style.display = "block"
+    roundScores.innerHTML = ""
+
+    roundScores.style.display = "flex"
+
+    const scoresHeader = document.createElement("h2")
+    scoresHeader.textContent = "Round Winners:"
+    roundScores.appendChild(scoresHeader)
     
-    // const roundObj = ROUND_WINS.reduce((prev, current, index) => ({
-    //     ...prev,
-    //     [`Round ${index + 1}`]: current === true ? "Player 1" : "Player 2"
+    ROUND_WINS.forEach((roundStatus, index) => {
+        let status;
 
-    // }), "")
+        if(roundStatus == P1Win){
+            status = "Player 1"
+        }
+        else if(roundStatus == P2Win) {
+            status = "Player 2"
+        }
+        else {
+            status = "Draw"
+        }
 
-
-    const text = ROUND_WINS.reduce((prev, player1, index) => {
+        
         const roundNum = index + 1
-        const player = player1 ? "Player 1" : "Player 2"
+        const text = `Round ${roundNum}: ${status}`
 
-        return `${prev}\nRound ${roundNum}: ${player}`
-
-    }, "")
-
-    roundScores.textContent = `Round winners\n ${text}`
-
-    console.log(text)
+        const p = document.createElement("p")
+        p.textContent = text
+        roundScores.appendChild(p)
+    })
 
 }
 
@@ -175,29 +228,18 @@ function checkForWinner(x, y, WIN_COUNT) {
     const columns = checkColumns(x, y, WIN_COUNT)
     const diagonal = checkDiags(x, y, WIN_COUNT)
 
-    if(rows.length == WIN_COUNT) {
-        const flashInterval = setInterval(() => flashBoardItem(rows), 100)
-        setTimeout(() => clearInterval(flashInterval), 3000)
 
-        return true
+    if(rows.length == WIN_COUNT) {
+        return rows
 
     } else if(columns.length == WIN_COUNT) {
-        const flashInterval = setInterval(() => flashBoardItem(columns), 100)
-        setTimeout(() => clearInterval(flashInterval), 3000)
-
-        return true
+        return columns
     }
     else if(diagonal.length == WIN_COUNT) {
-        const flashInterval = setInterval(() => flashBoardItem(diagonal), 100)
-        setTimeout(() => clearInterval(flashInterval), 3000)
-
-        return true
+        return diagonal
     }
 
-
-    return false
-
-
+    return null
 }
 
 
@@ -291,6 +333,7 @@ function checkDiags(x, y, winAmount) {
     winningIdx.push(startIdx)
 
     // for diagonal goin from top left to bottom right
+
     let topLeftX = x - 1
     let topLeftY = y - 1
 
@@ -332,6 +375,10 @@ function checkDiags(x, y, winAmount) {
     if(winningIdx.length == winAmount) {
         return winningIdx
     }
+
+    // reset winning position array for the next diagonal
+    winningIdx.length = 0
+    winningIdx.push(startIdx)
 
     // for diagonal going from top right to bottom left
     let topRightX = x + 1
