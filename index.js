@@ -108,7 +108,7 @@ function initBoard(board_size) {
 
 
                 if(winningRows != null){
-                    statusText.innerHTML = `${P1_TURN ? "Player 1" : "Player 2"} wins`
+                    statusText.innerHTML = `${P1_TURN ? "Player 1" : "Player 2"} wins ${NUM_ROUNDS > 1 ? `Round ${CURRENT_ROUND}` : ""}`
 
                     
                     ROUND_WINS.push(P1_TURN ? P1Win : P2Win)
@@ -176,6 +176,7 @@ function initBoard(board_size) {
     }
 }
 
+
 function calculateRoundWinner() {
     const p1WinCount = ROUND_WINS
         .reduce((previous, roundWinner) => {
@@ -206,13 +207,16 @@ function calculateRoundWinner() {
         }, 0)
 
     if(p1WinCount > p2WinCount && p1WinCount > drawCount){
-        updateRoundStatusText("Player 1 is the champion")    
+        statusText.textContent = "Player 1 is the champion"   
     }
     else if(p2WinCount > p1WinCount && p2WinCount > drawCount){
-        updateRoundStatusText("Player 2 is the champion")    
+        statusText.textContent = "Player 2 is the champion"
     }
     else if(drawCount > p1WinCount && drawCount > p2WinCount){
-        updateRoundStatusText("You are both losers")
+        statusText.textContent = "You are both losers"
+    }
+    else if(p1WinCount === p2WinCount){
+        statusText.textContent = "You are both losers"
     }
 }
 
