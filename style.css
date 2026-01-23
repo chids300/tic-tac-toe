@@ -2,8 +2,11 @@
 
 body {
     font-family: "Roboto", sans-serif;
-    background-color: #303030;
+    /* background-color: #303030; */
     color: white;
+    background-image: linear-gradient(to bottom, #4b4453, #664b56, #7a5750, #7e694b, #717e56);
+    height: 100vh;
+
 }
 
 #header {
@@ -33,7 +36,14 @@ body {
     display: flex;
     gap: 1em;
     justify-content: center;
-    padding-top: 1em;
+    margin-top: 1em;
+    align-items: center;
+
+    padding: 1em 0em 1em 0em;
+
+    border: 2px solid #4B4453;
+    background-color: #717E56;
+    border-radius: 2em;
 }
 
 #round-info {
@@ -66,7 +76,7 @@ body {
     border-radius: 0.5em;
     border-style: solid;
     border-color: lightgrey;
-    border-width: 2px;
+    border-width: 7px;
     display: flex;
     justify-content: center;
     align-items: center;
