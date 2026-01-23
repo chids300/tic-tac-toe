@@ -29,13 +29,32 @@
             <button id="restart-btn" onclick="window.location.reload()">restart game</button>
 
             <div id="round-container">
-                <label for="round-select">Number of rounds</label>
-                <select name="numRounds" id="round-select">
-                    <option value="1"> 1</option>
-                    <option value="2"> 2</option>
-                    <option value="3"> 3</option>
-                    <option value="4"> 4</option>
-                </select>
+            </div>
+
+            <div class="column-container">
+                <div>
+                    <label for="round-select">Number of rounds</label>
+                    <select name="numRounds" id="round-select">
+                        <option value="1"> 1</option>
+                        <option value="2"> 2</option>
+                        <option value="3"> 3</option>
+                        <option value="4"> 4</option>
+                    </select>
+                </div>
+
+                
+                <div class="column-container" id="grid-width-container">
+                    <label for="grid-width">change grid width (default 3)</label>
+                    <input id='gridWidth' name="grid-width" type="number"/>
+                </div>
+
+                <div class="column-container" id="win-amount-container">
+                    <label for="win-count">enter amount needed in a row to win (default 3)</label>
+                    <input id="winAmount" name="win-count" type="number"/>
+                </div>
+
+                <button id="save-config">save config</button>
+
             </div>
         </div>
 

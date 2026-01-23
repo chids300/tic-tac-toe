@@ -1,54 +1,21 @@
-let WIN_COUNT = 3
 let NUM_COLS = 3
-
 let BOARD_SIZE = NUM_COLS ** 2
 const BOARD = []
 
 let NUM_ROUNDS = 1
-const ROUND_WINS = []
 let CURRENT_ROUND = 1
 let TURN_COUNT = 0
+let WIN_COUNT = 3
+const ROUND_WINS = []
 
 let P1_TURN = true
 let GAME_OVER = false
 
+const CELL_WIDTH = "60px"
+
 const P1Win = 0
 const P2Win = 1
 const Draw = 2
-
-class Game {
-    
-}
-
-// to check if any moves have been made, i do this so
-let itemPlayed = false;
-
-const board = document.querySelector("#board")
-const statusText = document.querySelector("#status-text")
-const restartBtn = document.querySelector("#restart-btn")
-const roundSelection = document.querySelector("#round-select")
-const roundStatus = document.querySelector("#round-status")
-const roundScores = document.querySelector("#round-scores")
-
-
-roundSelection.addEventListener('change', function () {
-    if(itemPlayed) {
-        alert("restart game before changing round amount")
-        return
-    }
-
-    NUM_ROUNDS = Number(this.value)
-    console.log(NUM_ROUNDS)
-
-    if(NUM_ROUNDS >= 2) {
-        roundStatus.style.display = "block"
-        roundStatus.textContent = `round ${CURRENT_ROUND}/${NUM_ROUNDS}`
-    }
-    else{
-        roundStatus.style.display = "none"
-    }
-
-})
 
 // formula for mapping 1D coords to 2D coords and mapping it back
 // i = X + Y * numCols
@@ -56,9 +23,30 @@ roundSelection.addEventListener('change', function () {
 // X = index - (Y * width)
 
 
+// to check if any moves have been made, i do this so
+let itemPlayed = false;
 
-newGame(BOARD_SIZE)
+const board = document.querySelector("#board")
+const statusText = document.querySelector("#status-text")
+const restartBtn = document.querySelector("#restart-btn")
+const roundStatus = document.querySelector("#round-status")
+const roundScores = document.querySelector("#round-scores")
 
+const roundSelection = document.querySelector("#round-select")
+const gridWidth = document.querySelector("#gridWidth")
+const winCondition = document.querySelector("#winAmount")
+const saveConfigBtn = document.querySelector("#save-config")
+
+saveConfigBtn.addEventListener("click", updateGameConfig)
+
+
+initGame()
+
+function initGame() {
+    setBoardSize(3)
+    setWinCount(3)
+    newGame(BOARD_SIZE)
+}
 
 function newGame(board_size) {
     setStatusText("Player 1s turn")
@@ -73,13 +61,77 @@ function newGame(board_size) {
     GAME_OVER = false
     itemPlayed = false
 
+    initBoard(board_size)
+}
+
+function updateGameConfig() {
+    if(itemPlayed) {
+        alert("restart game before changing game configuration amount")
+        return
+    }
+
+    NUM_ROUNDS = roundSelection.value
+
+    if(NUM_ROUNDS >= 2) {
+        roundStatus.style.display = "block"
+        roundStatus.textContent = `round ${CURRENT_ROUND}/${NUM_ROUNDS}`
+    }
+    else{
+        roundStatus.style.display = "none"
+    }
+
+    setBoardSize(gridWidth.value)
+    setWinCount(winCondition.value)
+
     initBoard(BOARD_SIZE)
+
+    alert(`new game rules: ${WIN_COUNT} items in a row to win with ${NUM_ROUNDS} rounds to play`)
+}
+
+
+
+function setBoardSize(size) {
+    if(itemPlayed) {
+        alert("restart game before changing board size")
+        return
+    }
+    
+    let css = []
+
+    for(let i=0; i<size; i++) {
+        css.push(CELL_WIDTH)
+    }
+
+    cssStr = css.join(" ")
+
+    board.style.gridTemplateColumns = cssStr
+    board.style.gridTemplateRows = cssStr
+
+    console.log(board.style.gridTemplateColumns)
+    console.log(board.style)
+
+    NUM_COLS = size
+    BOARD_SIZE = NUM_COLS ** 2
+}
+
+function setWinCount(count) {
+    if(itemPlayed){
+        alert("restart game before changing board size")
+        return
+    }
+    else if(count > BOARD_SIZE){
+        alert("win count must be less than the length of the board")
+        return
+    }
+
+    WIN_COUNT = count
 }
 
 
 function initBoard(board_size) {
     board.innerHTML = ""
     BOARD.length= 0
+    setStatusText("Player 1's turn")
 
     for(let divIndex=0; divIndex<board_size; divIndex++){
         var div = document.createElement('div')
