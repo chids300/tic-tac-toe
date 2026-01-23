@@ -81,7 +81,7 @@ function initBoard(board_size) {
     board.innerHTML = ""
     BOARD.length= 0
 
-    for(let i =0; i<board_size; i++){
+    for(let divIndex=0; divIndex<board_size; divIndex++){
         var div = document.createElement('div')
         div.classList.add("boardItem")
         div.textContent = ""
@@ -113,11 +113,11 @@ function initBoard(board_size) {
                 // functions in js are able to capture the value of variables from surrounding scope if they are referenced inside the function (closure)
 
                 // this allows us to use the event handler to hold the i variable from the loop and we can use this to get the x,y position of the item on the board
-                const Y = Math.floor(i / NUM_COLS)
-                const X = i - (Y * NUM_COLS)
+                const Y = Math.floor(divIndex / NUM_COLS)
+                const X = divIndex - (Y * NUM_COLS)
 
                 // x, y pos makes checking win conditions easy
-                const winningRows = checkForWinner(X, Y, WIN_COUNT)
+                const winningRows = checkForWinner(divIndex, WIN_COUNT)
 
 
                 // winningRows is null if there is no winner
@@ -332,13 +332,13 @@ function nextRound() {
 // for diagonals it looks at cells (x +- 1), (y +- 1) to get the top right, top left, bottom right and bottom left colums
 
 
-function checkForWinner(x, y, WIN_COUNT) {
+function checkForWinner(index, WIN_COUNT) {
 
     // each function returns an array of indexes which contains the winning row/column/diagonal
 
-    const rows = checkRows(x, y, WIN_COUNT)
-    const columns = checkColumns(x, y, WIN_COUNT)
-    const diagonal = checkDiags(x, y, WIN_COUNT)
+    const rows = checkRows(index, WIN_COUNT)
+    const columns = checkColumns(index, WIN_COUNT)
+    const diagonal = checkDiags(index, WIN_COUNT)
 
     // check if these are equal to the win count
 
@@ -358,14 +358,17 @@ function checkForWinner(x, y, WIN_COUNT) {
 }
 
 
-function checkRows(x, y, winAmount) {
+function checkRows(startIdx, winAmount) {
     // want to check on the left and right side of the index
     // start with left side
+
+    const y = Math.floor(startIdx / NUM_COLS)
+    const x = startIdx - (y * NUM_COLS)
 
     const winningIdx = []
 
     // converts x,y coord to index to get starting position
-    const startIdx = x + y * NUM_COLS;
+    //const startIdx = x + y * NUM_COLS;
 
     winningIdx.push(startIdx)
 
@@ -402,8 +405,10 @@ function checkRows(x, y, winAmount) {
 }
 
 
-function checkColumns(x, y, winAmount) {
-    const startIdx = x + y * NUM_COLS;
+function checkColumns(startIdx, winAmount) {
+
+    const y = Math.floor(startIdx / NUM_COLS)
+    const x = startIdx - (y * NUM_COLS)
 
     const winningIdx = []
     winningIdx.push(startIdx)
@@ -445,8 +450,11 @@ function checkColumns(x, y, winAmount) {
     return winningIdx
 }
 
-function checkDiags(x, y, winAmount) {
-    const startIdx = x + y * NUM_COLS
+function checkDiags(startIdx, winAmount) {
+
+    const y = Math.floor(startIdx / NUM_COLS)
+    const x = startIdx - (y * NUM_COLS)
+
     const winningIdx = []
     winningIdx.push(startIdx)
 
