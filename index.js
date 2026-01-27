@@ -36,8 +36,14 @@ const roundSelection = document.querySelector("#round-select")
 const gridWidth = document.querySelector("#gridWidth")
 const winCondition = document.querySelector("#winAmount")
 const saveConfigBtn = document.querySelector("#save-config")
+const configOverlay = document.querySelector("#overlay")
 
 saveConfigBtn.addEventListener("click", updateGameConfig)
+
+// for displaying the game config options in the middle of the page
+document.addEventListener("DOMContentLoaded", (event) => {
+    configOverlay.style.display = "flex"
+})
 
 
 initGame()
@@ -70,6 +76,8 @@ function updateGameConfig() {
         return
     }
 
+    configOverlay.style.display = "none"
+
     NUM_ROUNDS = roundSelection.value
 
     if(NUM_ROUNDS >= 2) {
@@ -85,7 +93,7 @@ function updateGameConfig() {
 
     initBoard(BOARD_SIZE)
 
-    alert(`new game rules: ${WIN_COUNT} items in a row to win with ${NUM_ROUNDS} rounds to play`)
+    //alert(`new game rules: ${WIN_COUNT} items in a row to win with ${NUM_ROUNDS} rounds to play`)
 }
 
 
@@ -106,9 +114,6 @@ function setBoardSize(size) {
 
     board.style.gridTemplateColumns = cssStr
     board.style.gridTemplateRows = cssStr
-
-    console.log(board.style.gridTemplateColumns)
-    console.log(board.style)
 
     NUM_COLS = size
     BOARD_SIZE = NUM_COLS ** 2

@@ -9,6 +9,35 @@
     </head>
 
     <body>
+
+        <div id="overlay">
+            <div id='config-container' class="column-container">
+                <div>
+                    <label for="round-select">Number of rounds</label>
+                    <select name="numRounds" id="round-select">
+                        <option value="1"> 1</option>
+                        <option value="2"> 2</option>
+                        <option value="3"> 3</option>
+                        <option value="4"> 4</option>
+                    </select>
+                </div>
+                
+                <div class="column-container" id="grid-width-container">
+                    <label for="grid-width">Number of columns/rows</label>
+                    <input id='gridWidth' name="grid-width" type="number" value="3"/>
+                </div>
+
+                <div class="column-container" id="win-amount-container">
+                    <label for="win-count">Amount needed in a row to win</label>
+                    <input id="winAmount" name="win-count" type="number" value="3"/>
+                </div>
+
+
+                <button id="save-config">continue</button>
+
+            </div>
+        </div>
+
         <div id="header">
             <h1>ultimate tic tac toe</h1>
         </div>
@@ -25,43 +54,15 @@
         <div id="board">
         </div>
 
-        <div id="config-bar">
-            <button id="restart-btn" onclick="window.location.reload()">restart game</button>
-
-            <div id="round-container">
-            </div>
-
-            <div class="column-container">
-                <div>
-                    <label for="round-select">Number of rounds</label>
-                    <select name="numRounds" id="round-select">
-                        <option value="1"> 1</option>
-                        <option value="2"> 2</option>
-                        <option value="3"> 3</option>
-                        <option value="4"> 4</option>
-                    </select>
-                </div>
-
-                
-                <div class="column-container" id="grid-width-container">
-                    <label for="grid-width">change grid width (default 3)</label>
-                    <input id='gridWidth' name="grid-width" type="number"/>
-                </div>
-
-                <div class="column-container" id="win-amount-container">
-                    <label for="win-count">enter amount needed in a row to win (default 3)</label>
-                    <input id="winAmount" name="win-count" type="number"/>
-                </div>
-
-                <button id="save-config">save config</button>
-
-            </div>
-        </div>
-
         <div id="round-info">
             <div id="round-scores">
                 <h2>Round Winners:</h2>
             </div>
         </div>
+
+        <div id="config-bar">
+            <button id="restart-btn" onclick="window.location.reload()">restart game</button>
+        </div>
+
     </body>
 </html>
